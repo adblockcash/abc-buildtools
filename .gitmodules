@@ -1,0 +1,3 @@
+[submodule "jshydra"]
+	path = jshydra
+	url = https://github.com/adblockplus/jshydra
