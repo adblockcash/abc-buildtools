@@ -23,7 +23,7 @@ def getIgnoredFiles(params):
   return result
 
 def getPackageFiles(params):
-  result = set(('_locales', 'icons', 'jquery-ui', 'lib', 'skin', 'ui', 'ext'))
+  result = set(('_locales', 'assets', 'icons', 'lib', 'skin', 'ui', 'ext'))
 
   if params['devenv']:
     result.add('qunit')
