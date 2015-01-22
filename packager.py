@@ -7,11 +7,29 @@
 # Note: These are the base functions common to all packagers, the actual
 # packagers are implemented in packagerGecko and packagerChrome.
 
-import sys, os, re, codecs, subprocess, json, zipfile
+import sys, os, re, codecs, subprocess, json, zipfile, glob2
 from StringIO import StringIO
 from chainedconfigparser import ChainedConfigParser
 
 import buildtools
+
+def removeEmptyFolders(path):
+  if not os.path.isdir(path):
+    return
+
+  # remove empty subfolders
+  files = os.listdir(path)
+  if len(files):
+    for f in files:
+      fullpath = os.path.join(path, f)
+      if os.path.isdir(fullpath):
+        removeEmptyFolders(fullpath)
+
+  # if folder empty, delete it
+  files = os.listdir(path)
+  print path, len(files)
+  if len(files) == 0:
+    os.rmdir(path)
 
 def getDefaultFileName(baseDir, metadata, version, ext):
   return os.path.join(baseDir, '%s-%s.%s' % (metadata.get('general', 'basename'), version, ext))
@@ -101,6 +119,23 @@ class Files(dict):
         self.read(path, target)
       else:
         print >>sys.stderr, 'Warning: Mapped file %s doesn\'t exist' % source
+
+  def removeAssets(self, skipPaths, relpath):
+    assets = glob2.glob("%s/assets/**/*" % relpath)
+    assets.extend(glob2.glob("%s/assets/**/.*" % relpath))
+    for asset in assets:
+      skip = False
+
+      for skipPath in skipPaths:
+        if asset.find(skipPath) == 0:
+          skip = True
+          break
+
+      if not skip and os.path.isfile(asset):
+        os.remove(asset)
+
+    removeEmptyFolders("%s/assets/" % relpath)
+
 
   def preprocess(self, filenames, params={}):
     import jinja2

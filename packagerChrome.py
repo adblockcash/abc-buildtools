@@ -13,7 +13,7 @@ from packager import readMetadata, getMetadataPath, getDefaultFileName, getBuild
 defaultLocale = 'en_US'
 
 def getIgnoredFiles(params):
-  result = set(('store.description',))
+  result = set(('gulpfile.js', 'store.description',))
 
   # Hack: ignore all lib subdirectories
   libDir = os.path.join(params['baseDir'], 'lib')
@@ -30,7 +30,7 @@ def getPackageFiles(params):
 
   baseDir = params['baseDir']
   for file in os.listdir(baseDir):
-    if file.endswith('.js') or file.endswith('.html') or file.endswith('.xml'):
+    if file.endswith('.js') or file.endswith('.html') or file.endswith('.xml') or file.endswith('bower.json'):
       result.add(file)
   return result
 
@@ -357,6 +357,10 @@ def createBuild(baseDir, type='chrome', outFile=None, buildNum=None, releaseBuil
 
   if metadata.has_section('mapping'):
     files.readMappedFiles(metadata.items('mapping'))
+
+  if metadata.has_section('removeAssets'):
+    files.removeAssets(re.split(r'\s+', metadata.get('removeAssets', 'skipPaths')), baseDir)
+
   files.read(baseDir)
 
   if metadata.has_section('convert_js'):
