@@ -27,7 +27,6 @@ def removeEmptyFolders(path):
 
   # if folder empty, delete it
   files = os.listdir(path)
-  print path, len(files)
   if len(files) == 0:
     os.rmdir(path)
 
