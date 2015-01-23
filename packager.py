@@ -73,9 +73,10 @@ def getTemplate(template, autoEscape=False):
   return env.get_template(template)
 
 class Files(dict):
-  def __init__(self, includedFiles, ignoredFiles, process=None):
+  def __init__(self, includedFiles, ignoredFiles, requiredAssets, process=None):
     self.includedFiles = includedFiles
     self.ignoredFiles = ignoredFiles
+    self.requiredAssets = requiredAssets
     self.process = process
 
   def __setitem__(self, key, value):
@@ -85,11 +86,20 @@ class Files(dict):
 
   def isIncluded(self, relpath):
     parts = relpath.split('/')
+
     if not parts[0] in self.includedFiles:
       return False
+
     for part in parts:
       if part in self.ignoredFiles:
         return False
+
+    if relpath.find("assets/") == 0 and os.path.isfile(relpath):
+      for asset in self.requiredAssets:
+        if relpath.find(asset) == 0:
+          return True
+      return False
+
     return True
 
   def read(self, path, relpath='', skip=None):
@@ -118,23 +128,6 @@ class Files(dict):
         self.read(path, target)
       else:
         print >>sys.stderr, 'Warning: Mapped file %s doesn\'t exist' % source
-
-  def removeAssets(self, skipPaths, relpath):
-    assets = glob2.glob("%s/assets/**/*" % relpath)
-    assets.extend(glob2.glob("%s/assets/**/.*" % relpath))
-    for asset in assets:
-      skip = False
-
-      for skipPath in skipPaths:
-        if asset.find(skipPath) == 0:
-          skip = True
-          break
-
-      if not skip and os.path.isfile(asset):
-        os.remove(asset)
-
-    removeEmptyFolders("%s/assets/" % relpath)
-
 
   def preprocess(self, filenames, params={}):
     import jinja2

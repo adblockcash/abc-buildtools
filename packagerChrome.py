@@ -352,14 +352,16 @@ def createBuild(baseDir, type='chrome', outFile=None, buildNum=None, releaseBuil
     'metadata': metadata,
   }
 
-  files = Files(getPackageFiles(params), getIgnoredFiles(params),
+  requiredAssets = ()
+  if metadata.has_section('buildConfig'):
+    requiredAssets = re.split(r'\s+', metadata.get('buildConfig', 'requiredAssets'))
+
+  files = Files(getPackageFiles(params), getIgnoredFiles(params), requiredAssets,
                 process=lambda path, data: processFile(path, data, params))
+
 
   if metadata.has_section('mapping'):
     files.readMappedFiles(metadata.items('mapping'))
-
-  if metadata.has_section('removeAssets'):
-    files.removeAssets(re.split(r'\s+', metadata.get('removeAssets', 'skipPaths')), baseDir)
 
   files.read(baseDir)
 
