@@ -219,7 +219,11 @@ def createBuild(baseDir, type, outFile=None, buildNum=None, releaseBuild=False, 
     'metadata': metadata,
   }
 
-  files = Files(getPackageFiles(params), getIgnoredFiles(params),
+  requiredAssets = ()
+  if metadata.has_section('buildConfig'):
+    requiredAssets = re.split(r'\s+', metadata.get('buildConfig', 'requiredAssets'))
+
+  files = Files(getPackageFiles(params), getIgnoredFiles(params), requiredAssets,
                 process=lambda path, data: processFile(path, data, params))
   if metadata.has_section('mapping'):
     files.readMappedFiles(metadata.items('mapping'))

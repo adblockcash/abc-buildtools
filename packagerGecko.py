@@ -299,7 +299,11 @@ def createBuild(baseDir, type="gecko", outFile=None, locales=None, buildNum=None
     'multicompartment': multicompartment,
   }
 
-  files = Files(getPackageFiles(params), getIgnoredFiles(params),
+  requiredAssets = ()
+  if metadata.has_section('buildConfig'):
+    requiredAssets = re.split(r'\s+', metadata.get('buildConfig', 'requiredAssets'))
+
+  files = Files(getPackageFiles(params), getIgnoredFiles(params), requiredAssets,
                 process=lambda path, data: processFile(path, data, params))
   files['install.rdf'] = createManifest(params)
   if metadata.has_section('mapping'):

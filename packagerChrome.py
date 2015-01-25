@@ -352,9 +352,9 @@ def createBuild(baseDir, type='chrome', outFile=None, buildNum=None, releaseBuil
     'metadata': metadata,
   }
 
-  requiredAssets = ()
-  if metadata.has_section('buildConfig'):
-    requiredAssets = re.split(r'\s+', metadata.get('buildConfig', 'requiredAssets'))
+  # requiredAssets = ()
+  # if metadata.has_section('buildConfig'):
+  requiredAssets = re.split(r'\s+', metadata.get('buildConfig', 'requiredAssets'))
 
   files = Files(getPackageFiles(params), getIgnoredFiles(params), requiredAssets,
                 process=lambda path, data: processFile(path, data, params))
