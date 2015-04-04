@@ -361,7 +361,7 @@ def generateDocs(baseDir, scriptName, opts, args, type):
   if toolkit == None:
     toolkit = os.path.join(baseDir, 'jsdoc-toolkit')
     if not os.path.exists(toolkit):
-      subprocess.check_call(['hg', 'clone', 'https://hg.adblockplus.org/jsdoc-toolkit/', toolkit])
+      subprocess.check_call(['hg', 'clone', 'https://hg.adblockcash.org/jsdoc-toolkit/', toolkit])
 
   command = [os.path.join(toolkit, 'jsrun.js'),
              '-t=' + os.path.join(toolkit, 'templates', 'jsdoc'),

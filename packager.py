@@ -41,7 +41,7 @@ def readMetadata(baseDir, type):
 
 def getBuildNum(baseDir):
   try:
-    result = subprocess.check_output(['hg', 'id', '-R', baseDir, '-n'])
+    result = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
     return re.sub(r'\D', '', result)
   except:
     return '0'

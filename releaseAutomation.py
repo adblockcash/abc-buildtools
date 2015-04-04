@@ -63,7 +63,7 @@ def run(baseDir, type, version, keyFiles, downloadsRepo):
     locales_base = baseDir
   else:
     # This is somewhat of a hack but reading out locale import config here would be too much
-    locales_base = os.path.join(baseDir, "adblockplus")
+    locales_base = os.path.join(baseDir, "adblockcash")
 
   locales = packagerGecko.readLocaleMetadata(locales_base, [packagerGecko.defaultLocale])
   extensionName = locales[packagerGecko.defaultLocale]['name']
