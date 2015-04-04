@@ -73,10 +73,11 @@ def getTemplate(template, autoEscape=False):
   return env.get_template(template)
 
 class Files(dict):
-  def __init__(self, includedFiles, ignoredFiles, requiredAssets, process=None):
+  def __init__(self, includedFiles, ignoredFiles, requiredAssets=None, requiredAssetsPath=None, process=None):
     self.includedFiles = includedFiles
     self.ignoredFiles = ignoredFiles
     self.requiredAssets = requiredAssets
+    self.requiredAssetsPath = requiredAssetsPath
     self.process = process
 
   def __setitem__(self, key, value):
@@ -94,11 +95,12 @@ class Files(dict):
       if part in self.ignoredFiles:
         return False
 
-    if relpath.find("assets/") == 0 and os.path.isfile(relpath):
-      for asset in self.requiredAssets:
-        if relpath.find(asset) == 0:
-          return True
-      return False
+    if self.requiredAssets and self.requiredAssetsPath:
+      if relpath.find(self.requiredAssetsPath) == 0 and os.path.isfile(relpath):
+        for asset in self.requiredAssets:
+          if relpath.find(asset) == 0:
+            return True
+        return False
 
     return True
 

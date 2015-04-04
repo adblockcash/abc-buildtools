@@ -300,25 +300,36 @@ def createBuild(baseDir, type="gecko", outFile=None, locales=None, buildNum=None
   }
 
   requiredAssets = ()
+  requiredAssetsPath = None
   if metadata.has_section('buildConfig'):
     requiredAssets = re.split(r'\s+', metadata.get('buildConfig', 'requiredAssets'))
+    requiredAssetsPath = metadata.get('buildConfig', 'requiredAssetsPath')
 
-  files = Files(getPackageFiles(params), getIgnoredFiles(params), requiredAssets,
+  files = Files(getPackageFiles(params), getIgnoredFiles(params),
+                requiredAssets=requiredAssets, requiredAssetsPath=requiredAssetsPath,
                 process=lambda path, data: processFile(path, data, params))
+
   files['install.rdf'] = createManifest(params)
+
   if metadata.has_section('mapping'):
     files.readMappedFiles(metadata.items('mapping'))
+
   files.read(baseDir, skip=('chrome'))
+
   for name, path in getChromeSubdirs(baseDir, params['locales']).iteritems():
     if os.path.isdir(path):
       files.read(path, 'chrome/%s' % name)
   fixupLocales(params, files)
+
   if not 'bootstrap.js' in files:
     addMissingFiles(params, files)
+
   if metadata.has_section('preprocess'):
     files.preprocess([f for f, _ in metadata.items('preprocess')])
+
   if keyFile:
     signFiles(files, keyFile)
+
   files.zip(outFile, sortKey=lambda x: '!' if x == 'META-INF/zigbert.rsa' else x)
 
 def autoInstall(baseDir, type, host, port, multicompartment=False):

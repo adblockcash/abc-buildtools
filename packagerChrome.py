@@ -23,7 +23,7 @@ def getIgnoredFiles(params):
   return result
 
 def getPackageFiles(params):
-  result = set(('_locales', 'assets', 'dist', 'icons', 'lib', 'skin', 'ui', 'ext'))
+  result = set(('_locales', 'shared', 'dist', 'icons', 'lib', 'skin', 'ui', 'ext'))
 
   if params['devenv']:
     result.add('qunit')
@@ -71,10 +71,10 @@ def createManifest(params, files):
       # ... = icon.png
       icon, popup = icons[0], None
     elif len(icons) == 2:
-      # ... = icon.png popup.html
+      # ... = icon.png shared/popup.html
       icon, popup = icons
     else:
-      # ... = icon-19.png icon-38.png popup.html
+      # ... = icon-19.png icon-38.png shared/popup.html
       popup = icons.pop()
       icon = makeIcons(files, icons)
 
@@ -352,13 +352,15 @@ def createBuild(baseDir, type='chrome', outFile=None, buildNum=None, releaseBuil
     'metadata': metadata,
   }
 
-  # requiredAssets = ()
-  # if metadata.has_section('buildConfig'):
-  requiredAssets = re.split(r'\s+', metadata.get('buildConfig', 'requiredAssets'))
+  requiredAssets = ()
+  requiredAssetsPath = None
+  if metadata.has_section('buildConfig'):
+    requiredAssets = re.split(r'\s+', metadata.get('buildConfig', 'requiredAssets'))
+    requiredAssetsPath = metadata.get('buildConfig', 'requiredAssetsPath')
 
-  files = Files(getPackageFiles(params), getIgnoredFiles(params), requiredAssets,
+  files = Files(getPackageFiles(params), getIgnoredFiles(params),
+                requiredAssets=requiredAssets, requiredAssetsPath=requiredAssetsPath,
                 process=lambda path, data: processFile(path, data, params))
-
 
   if metadata.has_section('mapping'):
     files.readMappedFiles(metadata.items('mapping'))

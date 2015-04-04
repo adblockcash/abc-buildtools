@@ -220,10 +220,13 @@ def createBuild(baseDir, type, outFile=None, buildNum=None, releaseBuild=False, 
   }
 
   requiredAssets = ()
+  requiredAssetsPath = None
   if metadata.has_section('buildConfig'):
     requiredAssets = re.split(r'\s+', metadata.get('buildConfig', 'requiredAssets'))
+    requiredAssetsPath = metadata.get('buildConfig', 'requiredAssetsPath')
 
-  files = Files(getPackageFiles(params), getIgnoredFiles(params), requiredAssets,
+  files = Files(getPackageFiles(params), getIgnoredFiles(params),
+                requiredAssets=requiredAssets, requiredAssetsPath=requiredAssetsPath,
                 process=lambda path, data: processFile(path, data, params))
   if metadata.has_section('mapping'):
     files.readMappedFiles(metadata.items('mapping'))
