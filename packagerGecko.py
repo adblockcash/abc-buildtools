@@ -45,7 +45,7 @@ def getChromeSubdirs(baseDir, locales):
   return result
 
 def getPackageFiles(params):
-  result = set(('chrome', 'components', 'modules', 'lib', 'resources', 'defaults', 'chrome.manifest', 'icon.png', 'icon64.png',))
+  result = set(('chrome', 'components', 'modules', 'lib', 'resources', 'defaults', 'chrome.manifest', 'icon.png', 'icon64.png', ))
 
   baseDir = params['baseDir']
   for file in os.listdir(baseDir):
@@ -133,9 +133,9 @@ def initTranslators(localeMetadata):
     else:
       locale['translators'] = []
 
-def createManifest(params):
+def createManifest(templateFile, params, autoEscape=True):
   global KNOWN_APPS, defaultLocale
-  template = getTemplate('install.rdf.tmpl', autoEscape=True)
+  template = getTemplate(templateFile, autoEscape=autoEscape)
   templateData = dict(params)
   templateData['localeMetadata'] = readLocaleMetadata(params['baseDir'], params['locales'])
   initTranslators(templateData['localeMetadata'])
@@ -223,8 +223,8 @@ def addMissingFiles(params, files):
       files.read(path, moduleFile)
       checkScript(moduleFile)
 
-  template = getTemplate('bootstrap.js.tmpl')
-  files['bootstrap.js'] = template.render(templateData).encode('utf-8')
+  # template = getTemplate('bootstrap.js.tmpl')
+  # files['bootstrap.js'] = template.render(templateData).encode('utf-8')
 
 def signFiles(files, keyFile):
   import M2Crypto
@@ -309,7 +309,8 @@ def createBuild(baseDir, type="gecko", outFile=None, locales=None, buildNum=None
                 requiredAssets=requiredAssets, requiredAssetsPath=requiredAssetsPath,
                 process=lambda path, data: processFile(path, data, params))
 
-  files['install.rdf'] = createManifest(params)
+  files['install.rdf'] = createManifest('install.rdf.tmpl', params)
+  files['package.json'] = createManifest('package.json.tmpl', params, autoEscape=False)
 
   if metadata.has_section('mapping'):
     files.readMappedFiles(metadata.items('mapping'))
@@ -321,8 +322,8 @@ def createBuild(baseDir, type="gecko", outFile=None, locales=None, buildNum=None
       files.read(path, 'chrome/%s' % name)
   fixupLocales(params, files)
 
-  if not 'bootstrap.js' in files:
-    addMissingFiles(params, files)
+  # if not 'bootstrap.js' in files:
+  #   addMissingFiles(params, files)
 
   if metadata.has_section('preprocess'):
     files.preprocess([f for f, _ in metadata.items('preprocess')])

@@ -2,11 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-require.scopes.info = {
-  addonID: '',
-  addonName: {{ metadata.get('general', 'basename')|json }},
-  addonVersion: {{ version|json }},
-  addonRoot: '',
+require.scopes["./info"] = {
+  addon: {
+    id: '',
+    name: {{ metadata.get('general', 'basename')|json }},
+    version: {{ version|json }},
+    root: ''
+  },
 
   application: 'safari',
   get applicationVersion() {
