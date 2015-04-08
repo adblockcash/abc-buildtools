@@ -4,7 +4,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import os, sys, re, hashlib, base64, urllib, json
+import os, sys, re, hashlib, base64, urllib, json, subprocess
 from ConfigParser import SafeConfigParser
 from StringIO import StringIO
 import xml.dom.minidom as minidom
@@ -336,4 +336,15 @@ def createBuild(baseDir, type="gecko", outFile=None, locales=None, buildNum=None
 def autoInstall(baseDir, type, host, port, multicompartment=False):
   fileBuffer = StringIO()
   createBuild(baseDir, type=type, outFile=fileBuffer, multicompartment=multicompartment)
+
+  # from zipfile import ZipFile
+  # zip = ZipFile(StringIO(fileBuffer.getvalue()), 'r')
+  # zip.extractall(os.path.join(baseDir, 'xpi'))
+  # zip.close()
+
+  # # TODO cd into xpi directory
+  # subprocess.call(["cfx", "xpi", "--output-file=build.xpi"])
+
+  # # TODO read build.xpi into fileBuffer
+
   urllib.urlopen('http://%s:%s/' % (host, port), data=fileBuffer.getvalue())
